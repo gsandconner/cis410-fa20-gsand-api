@@ -1,5 +1,6 @@
 const express = require('express')
-const db = require('./dbConnectExec.js')
+const db = require('./dbConnectExec.js');
+const { send } = require('process');
 
 
 
@@ -25,5 +26,29 @@ res.status(200).send(result)
     res.status(500).send()
 })
 })
+app.get("/stickers/:ID", (req,res)=>{
+    var ID =req.params.ID
+    //console.log("myID:" , ID)
+    var myQuery = `SELECT *
+    FROM Sticker
+    left join Artist
+    ON Artist.ArtistID = Sticker.ArtistID
+    WHERE StickerID =${ID}`
 
+    db.executeQuery(myQuery)
+    .then((stickers)=>{
+        //console.log("Stickers: ", stickers)
+
+        if(stickers[0]){
+            res.send(stickers[0])
+        }else{
+            res.status(404).send('bad request')
+        }
+        
+    })
+    .catch((myError)=>{
+        console.log("ERROR",myError)
+        res.status(500).send()
+                })
+})
 app.listen(5000,()=>{console.log("app is running on port 5000")})
