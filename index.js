@@ -1,7 +1,9 @@
 const express = require('express')
 const db = require('./dbConnectExec.js');
 const { send } = require('process');
-const bcrypt = require('bcrypt')
+const jwt =require('jsonwebtoken')
+const config =require('./config.js')
+//const bcrypt = require('./bcrypt.js')
 
 
 //azurewebsites.net, colostate.edu
@@ -35,11 +37,36 @@ app.post("/Customer/login", async (req,res)=>{
     let user = result[0];
     console.log(user);
 
-    if(!bcrypt.compareSync(CustomerPassword,user.CustomerPassword)){
+    //if(!bcrypt.compareSync(CustomerPassword,user.CustomerPassword)){
         console.log("Invalid Password")
-    }
+    //}
     //3. Generate Token
+    let token = jwt.sign({CustomerID: user.CustomerID}, config.JWT, {expiresIn: '60 minutes'})
+    console.log(token)
     //4. Save Token
+
+let setTokenQuery = `UPDATE Customer
+SET CustomerToken = '${token}'
+WHERE CustomerID =${user.CustomerID}`
+
+try{
+    await db.executeQuery(setTokenQuery)
+    res.status(200).send({
+        token:token,
+        user: {
+            CustomerFName: user.CustomerFName,
+            CustomerLName: user.CustomerLName,
+            CustomerEmail: user.CustomerEmail,
+            CustomerID:user.CustomerID
+        }
+
+    })
+}
+catch(myError){
+    console.log("Error setting user token",mytoken)
+    res.status(500).send()
+}
+
 })
 
 app.get("/hi",(req,res)=>{
@@ -53,6 +80,12 @@ var CustomerFName =req.body.CustomerFName;
 var CustomerLName =req.body.CustomerLName;
 var CustomerEmail =req.body.CustomerEmail;
 var CustomerPassword=req.body.CustomerPassword;
+
+if(!CustomerFName || !CustomerLName || !CustomerEmail ||!CustomerPassword){
+    return res.status[400].send("Bad Request")
+}
+CustomerFName=CustomerFName.replace("'","''")
+CustomerLName=CustomerLName.replace("'","''")
 
 var emailCheckQuery=`SELECT CustomerEmail
 FROM Customer
