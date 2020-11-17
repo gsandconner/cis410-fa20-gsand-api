@@ -1,16 +1,80 @@
 const express = require('express')
 const db = require('./dbConnectExec.js');
 const { send } = require('process');
-
+const bcrypt = require('bcrypt')
 
 
 //azurewebsites.net, colostate.edu
 const app = express();
 app.use(express.json())
 
+app.post("/Customer/login", async (req,res)=>{
+    //console.log(req.body)
+    var CustomerEmail = req.body.CustomerEmail;
+    var CustomerPassword = req.body.CustomerPassword;
+
+    if(!CustomerEmail, !CustomerPassword){
+ return res.status(400).send('bad request')
+    }
+
+    //1. Chech that Email Exists in Database
+    var query =`SELECT *
+    FROM Customer
+    WHERE CustomerEmail = '${CustomerEmail}'`
+
+    let result;
+    try{
+    result = await db.executeQuery(query);
+    }catch(myError){
+        console.log('Error in Contacts/login:',myError)
+        return res.status(500).send()
+    }
+    console.log(result)
+    if(!result[0]){return res.status(400).send('Invalid User Credentials')}
+    //2. Check Password Matches
+    let user = result[0];
+    console.log(user);
+
+    if(!bcrypt.compareSync(CustomerPassword,user.CustomerPassword)){
+        console.log("Invalid Password")
+    }
+    //3. Generate Token
+    //4. Save Token
+})
 
 app.get("/hi",(req,res)=>{
     res.send("hello World")
+})
+app.post("/Customer", async (req,res)=>{
+    res.send("creating user")
+    console.log("request body", req.body)
+
+var CustomerFName =req.body.CustomerFName;
+var CustomerLName =req.body.CustomerLName;
+var CustomerEmail =req.body.CustomerEmail;
+var CustomerPassword=req.body.CustomerPassword;
+
+var emailCheckQuery=`SELECT CustomerEmail
+FROM Customer
+WHERE CustomerEmail='${CustomerEmail}'`
+
+var existingUser = db.executeQuery(emailCheckQuery)
+
+
+//console.log("existing user", existingUser)
+
+if(existingUser[0]){
+    return res.status(409).send('Please Enter a Different Email.')}
+
+var hashedPassword = bycrypt.hashSync(CustomerPassword)
+
+var insertQuery =`INSERT INTO Customer(CustomerFName,CustomerLName,CustomerEmail,CustomerPassword,CustomerStreet,CustomerState,CustomerZip,CustomerPhone)
+VALUES('${CustomerFName}','${CustomerLName}','${CustomerEmail}','${hashedPassword}','123 Dove Lane','CO','1234567','99999999')`
+db.executeQuery(insertQuery).then(()=>{res.status[201].send()})
+.catch((myError)=>{
+    console.log("ERROR")
+})
+
 })
 app.get("/stickers", (req,res)=>{
 db.executeQuery (`SELECT *
