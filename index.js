@@ -2,8 +2,8 @@ const express = require('express')
 const db = require('./dbConnectExec.js');
 const { send } = require('process');
 const jwt =require('jsonwebtoken')
-const config =require('./config.js')
-//const bcrypt = require('./bcrypt.js')
+const config =require('./cis410-fa20-gsand-api/config.js')
+const bcrypt = require('bcrypt')
 
 
 //azurewebsites.net, colostate.edu
@@ -37,9 +37,9 @@ app.post("/Customer/login", async (req,res)=>{
     let user = result[0];
     console.log(user);
 
-    //if(!bcrypt.compareSync(CustomerPassword,user.CustomerPassword)){
+    if(!bcrypt.compareSync(CustomerPassword,user.CustomerPassword)){
         console.log("Invalid Password")
-    //}
+    }
     //3. Generate Token
     let token = jwt.sign({CustomerID: user.CustomerID}, config.JWT, {expiresIn: '60 minutes'})
     console.log(token)

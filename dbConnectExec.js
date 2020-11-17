@@ -1,5 +1,5 @@
 const sql = require('mssql')
-const gsandConfig = require('./config.js')
+const gsandConfig = require('./cis410-fa20-gsand-api/config.js')
 const config = {
     user: gsandConfig.DB.user,
     password: gsandConfig.DB.password,
