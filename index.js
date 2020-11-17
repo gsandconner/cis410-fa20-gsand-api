@@ -2,8 +2,8 @@ const express = require('express')
 const db = require('./dbConnectExec.js');
 const { send } = require('process');
 const jwt =require('jsonwebtoken')
-const config =require('./cis410-fa20-gsand-api/config.js')
-const bcrypt = require('bcrypt')
+const config =require('./config.js')
+ const bcrypt = require('bcrypt')
 
 
 //azurewebsites.net, colostate.edu
