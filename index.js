@@ -1,6 +1,6 @@
 const express = require('express')
 const db = require('./dbConnectExec.js');
-const { send } = require('process');
+//const { send } = require('process');
 const jwt =require('jsonwebtoken')
 const config =require('./config.js')
  const bcrypt = require('bcrypt')
@@ -12,6 +12,13 @@ app.use(express.json())
 
 app.use(cors())
 
+
+app.post('/Customer/logout', auth, (req,res)=>{
+
+})
+
+
+
 app.post("/CheckOut",auth, async (req,res)=>{
   try{
     var StickerID= req.body.StickerID;
@@ -19,18 +26,16 @@ app.post("/CheckOut",auth, async (req,res)=>{
     var NumberOfItems=req.body.NumberOfItems;
     var DateOfOrder=req.body.DateOfOrder;
     var OrderDescription=req.body.OrderDescription;
-    var QuotedPrice=req.body.QuotedPrice;
+    
     title=title.replace("'","''")
 
- let insertQuery =`INSERT INTO Order(StickerID, DateOfOrder, OrderDescription,QuotedPrice,NumberOfItems,CustomerFK)
+ let insertQuery =`INSERT INTO OrderTable(StickerID, DateOfOrder,NumberOfItems,CustomerFK)
  OUTPUT inserted.OrderID,inserted.DateOfOrder,inserted.NumberOfItems,inserted.StickerID
- VALUES(${StickerID},${DateOfOrder},${OrderDescription},${QuotedPrice},${NumberOfItems},${req.CustomerID.CustomerID})`
+ VALUES(${StickerID},${DateOfOrder},${NumberOfItems},${req.CustomerID.CustomerID})`
 
  let insertedOrder = await db.executeQuery(insertQuery)
  console.log(insertedOrder)
  res.status(201).send(insertedOrder[0])
-
-
 
 
   
@@ -188,5 +193,5 @@ app.get("/stickers/:ID", (req,res)=>{
         res.status(500).send()
                 })
 })
-const port=process.env.port ||5000
-app.listen(port,()=>{console.log(`app is running on port ${port}`)})
+const PORT=process.env.PORT ||5000
+app.listen(PORT,()=>{console.log(`app is running on port ${PORT}`)})
