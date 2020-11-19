@@ -4,11 +4,47 @@ const { send } = require('process');
 const jwt =require('jsonwebtoken')
 const config =require('./config.js')
  const bcrypt = require('bcrypt')
-
+const auth =require("./middleware/authenticate")
 
 //azurewebsites.net, colostate.edu
 const app = express();
 app.use(express.json())
+
+
+
+app.post("/CheckOut",auth, async (req,res)=>{
+  try{
+    var StickerID= req.body.StickerID;
+    var Title=req.body.Title;
+    var NumberOfItems=req.body.NumberOfItems;
+    var DateOfOrder=req.body.DateOfOrder;
+    var OrderDescription=req.body.OrderDescription;
+    var QuotedPrice=req.body.QuotedPrice;
+    title=title.replace("'","''")
+
+ let insertQuery =`INSERT INTO Order(StickerID, DateOfOrder, OrderDescription,QuotedPrice,NumberOfItems,CustomerFK)
+ OUTPUT inserted.OrderID,inserted.DateOfOrder,inserted.NumberOfItems,inserted.StickerID
+ VALUES(${StickerID},${DateOfOrder},${OrderDescription},${QuotedPrice},${NumberOfItems},${req.CustomerID.CustomerID})`
+
+ let insertedOrder = await db.executeQuery(insertQuery)
+ console.log(insertedOrder)
+ res.status(201).send(insertedOrder[0])
+
+
+
+
+  
+    if(!StickerID || !Title || !NumberOfItems ||!DateOfOrder ||!OrderDescription ||!QuotedPrice){
+        res.status(400).send("Bad Request")
+    }
+    res.send("Here is your response")}
+  catch(error){
+ console.log("There is an Error",error)
+ res.status(400).send()
+  }
+})
+
+
 
 app.post("/Customer/login", async (req,res)=>{
     //console.log(req.body)
@@ -67,6 +103,10 @@ catch(myError){
     res.status(500).send()
 }
 
+})
+
+app.get('/contacts/me',auth,(req,res)=>{
+    res.send(req.ContactID)
 })
 
 app.get("/hi",(req,res)=>{
