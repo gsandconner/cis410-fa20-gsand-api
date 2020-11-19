@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/bd83d158-b6f2-47a1-b002-63b18e041646/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/CIS410-FA20-Gsand-API",
+    "appService.deploySubpath": "."
+}

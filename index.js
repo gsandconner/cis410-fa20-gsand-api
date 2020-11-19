@@ -5,12 +5,12 @@ const jwt =require('jsonwebtoken')
 const config =require('./config.js')
  const bcrypt = require('bcrypt')
 const auth =require("./middleware/authenticate")
-
+const cors=require('cors')
 //azurewebsites.net, colostate.edu
 const app = express();
 app.use(express.json())
 
-
+app.use(cors())
 
 app.post("/CheckOut",auth, async (req,res)=>{
   try{
@@ -188,4 +188,5 @@ app.get("/stickers/:ID", (req,res)=>{
         res.status(500).send()
                 })
 })
-app.listen(5000,()=>{console.log("app is running on port 5000")})
+const port=process.env.port ||5000
+app.listen(port,()=>{console.log(`app is running on port ${port}`)})
