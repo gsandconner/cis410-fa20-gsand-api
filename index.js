@@ -14,10 +14,29 @@ app.use(cors())
 
 
 app.post('/Customer/logout', auth, (req,res)=>{
-
+var query =`UPDATE Customer
+SET CustomerToken =NULL
+WHERE CustomerID = ${req.CustomerID.CustomerID}`
+db.executeQuery(query)
+.then(()=>{res.status(200).send()})
+.catch((error)=>{console.log("Error in POST /contacts/logout", error)
+res.status(500).send()
+})
 })
 
+app.get('/CheckOut/me', auth,async(req,res)=>{
+let CustomerID=req.CustomerID.CustomerID
 
+let query= `SELECT *
+FROM OrderTable
+Where CustomerFK = ${CustomerID}`
+
+let MyCheckout = await db.executeQuery(query)
+
+console.log(MyCheckout)
+
+
+})
 
 app.post("/CheckOut",auth, async (req,res)=>{
   try{
