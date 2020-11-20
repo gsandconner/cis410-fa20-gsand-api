@@ -97,6 +97,7 @@ app.post("/Customer/login", async (req,res)=>{
 
     if(!bcrypt.compareSync(CustomerPassword,user.CustomerPassword)){
         console.log("Invalid Password")
+        return res.status(400).send("Invalid user crendentials")
     }
     //3. Generate Token
     let token = jwt.sign({CustomerID: user.CustomerID}, config.JWT, {expiresIn: '60 minutes'})
