@@ -22,26 +22,24 @@ app.post('/Customer/logout', auth, (req,res)=>{
 app.post("/CheckOut",auth, async (req,res)=>{
   try{
     var StickerID= req.body.StickerID;
-    var Title=req.body.Title;
     var NumberOfItems=req.body.NumberOfItems;
     var DateOfOrder=req.body.DateOfOrder;
-    var OrderDescription=req.body.OrderDescription;
     
-    title=title.replace("'","''")
 
  let insertQuery =`INSERT INTO OrderTable(StickerID, DateOfOrder,NumberOfItems,CustomerFK)
  OUTPUT inserted.OrderID,inserted.DateOfOrder,inserted.NumberOfItems,inserted.StickerID
  VALUES(${StickerID},${DateOfOrder},${NumberOfItems},${req.CustomerID.CustomerID})`
 
  let insertedOrder = await db.executeQuery(insertQuery)
- console.log(insertedOrder)
+ //console.log(insertedOrder)
  res.status(201).send(insertedOrder[0])
 
 
   
-    if(!StickerID || !Title || !NumberOfItems ||!DateOfOrder ||!OrderDescription ||!QuotedPrice){
+    if(!StickerID|| !NumberOfItems ||!DateOfOrder){
         res.status(400).send("Bad Request")
     }
+    console.log(req.CustomerID)
     res.send("Here is your response")}
   catch(error){
  console.log("There is an Error",error)
