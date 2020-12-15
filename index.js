@@ -35,7 +35,7 @@ let MyCheckout = await db.executeQuery(query)
 
 //console.log(MyCheckout)
 
-res.status(200).send(myCheckout)
+res.status(200).send(MyCheckout)
 })
 
 app.post("/CheckOut",auth, async (req,res)=>{
