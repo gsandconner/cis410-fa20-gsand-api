@@ -3,7 +3,7 @@ const db = require('./dbConnectExec.js');
 //const { send } = require('process');
 const jwt =require('jsonwebtoken')
 const config =require('./config.js')
- const bcrypt = require('bcrypt')
+ const bcrypt = require('bcryptjs')
 const auth =require("./middleware/authenticate")
 const cors=require('cors')
 //azurewebsites.net, colostate.edu
@@ -33,9 +33,9 @@ Where CustomerFK = ${CustomerID}`
 
 let MyCheckout = await db.executeQuery(query)
 
-console.log(MyCheckout)
+//console.log(MyCheckout)
 
-
+res.status(200).send(myCheckout)
 })
 
 app.post("/CheckOut",auth, async (req,res)=>{
@@ -135,8 +135,9 @@ app.get('/contacts/me',auth,(req,res)=>{
 app.get("/hi",(req,res)=>{
     res.send("hello World")
 })
+
 app.post("/Customer", async (req,res)=>{
-    res.send("creating user")
+   // res.send("creating user")
     console.log("request body", req.body)
 
 var CustomerFName =req.body.CustomerFName;
@@ -154,19 +155,19 @@ var emailCheckQuery=`SELECT CustomerEmail
 FROM Customer
 WHERE CustomerEmail='${CustomerEmail}'`
 
-var existingUser = db.executeQuery(emailCheckQuery)
+var existingUser = await db.executeQuery(emailCheckQuery)
 
 
-//console.log("existing user", existingUser)
+console.log("existing user", existingUser)
 
 if(existingUser[0]){
     return res.status(409).send('Please Enter a Different Email.')}
 
-var hashedPassword = bycrypt.hashSync(CustomerPassword)
+var hashedPassword = bcrypt.hashSync(CustomerPassword)
 
 var insertQuery =`INSERT INTO Customer(CustomerFName,CustomerLName,CustomerEmail,CustomerPassword,CustomerStreet,CustomerState,CustomerZip,CustomerPhone)
 VALUES('${CustomerFName}','${CustomerLName}','${CustomerEmail}','${hashedPassword}','123 Dove Lane','CO','1234567','99999999')`
-db.executeQuery(insertQuery).then(()=>{res.status[201].send()})
+db.executeQuery(insertQuery).then(()=>{res.status(201).send()})
 .catch((myError)=>{
     console.log("ERROR")
 })
